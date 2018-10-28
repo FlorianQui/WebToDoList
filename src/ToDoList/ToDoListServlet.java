@@ -11,6 +11,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class ToDoListServlet
@@ -43,30 +44,15 @@ public class ToDoListServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		String u_name = "Username";
-		String u_pass = "Password";
-		String u_role = "Role";
-
-		Cookie[] cookies = request.getCookies();
-		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals("username")) {
-					u_name = cookie.getValue();
-					System.out.println(u_name);
-				}
-				else if (cookie.getName().equals("password")) {
-					u_pass = cookie.getValue();
-					System.out.println(u_pass);
-				}
-				else if (cookie.getName().equals("role")) {
-					u_role = cookie.getValue();
-					System.out.println(u_role);
-				}
-			}
-		}
+		String u_name = "Unknown";
+		String u_role = "Unknown";
+		
+		HttpSession session = request.getSession();
+		
+		u_name = session.getAttribute("username").toString();
+		u_role = session.getAttribute("role").toString();
 		
 		request.setAttribute("u_name", u_name);
-		request.setAttribute("u_pass", u_pass);
 		request.setAttribute("u_role", u_role);
 		ArrayList<ToDo> toDoArrayList = new ArrayList<ToDo>();
 		

@@ -105,6 +105,9 @@ public class LoginServlet extends HttpServlet {
 			else {
 				User.Role role = mySqlConnector.checkUserRole(new User(username, password, null));
 				
+				session.setAttribute("username", username);
+				session.setAttribute("role", role.toString());
+				
 				Cookie c_uname = new Cookie("username", username);
 				Cookie c_pass = new Cookie("password", password);
 				Cookie c_role = new Cookie("role", role.toString());

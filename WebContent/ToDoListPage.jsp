@@ -26,7 +26,7 @@
 				</c:url>
 				<c:url var="Remove" value="remove">
 					<c:param name="toDoId" value="${ ToDo.getId() }"/>
-				</c:url>
+				</c:url>	
 				
 				<c:url var="Add" value="add"/>
 				
