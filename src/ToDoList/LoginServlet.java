@@ -22,12 +22,16 @@ public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private MySqlConnector mySqlConnector;
+	
+	private boolean loginfailed;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
     public LoginServlet() {
         super();
+        
+        loginfailed = true;
         
         try {
 			mySqlConnector = new MySqlConnector();
@@ -44,18 +48,31 @@ public class LoginServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String u_name = "Username";
+		String u_pass = "Password";
+		String u_role = "Role";
+
 		Cookie[] cookies = request.getCookies();
-		
-		if(cookies != null) {
-			for( int i = 0; i < cookies.length; i++) {
-				if(cookies[i].getName().equals("username")) {
-					request.setAttribute("username", cookies[i].getValue());
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("username")) {
+					u_name = cookie.getValue();
+					System.out.println(u_name);
 				}
-				if(cookies[i].getName().equals("password")) {
-					request.setAttribute("password", cookies[i].getValue());
+				else if (cookie.getName().equals("password")) {
+					u_pass = cookie.getValue();
+					System.out.println(u_pass);
+				}
+				else if (cookie.getName().equals("role")) {
+					u_role = cookie.getValue();
+					System.out.println(u_role);
 				}
 			}
 		}
+		
+		request.setAttribute("u_name", u_name);
+		request.setAttribute("u_pass", u_pass);
+		request.setAttribute("u_role", u_role);
 		
 		showLoginPage(request, response);
 	}
@@ -69,20 +86,44 @@ public class LoginServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String action = request.getParameter("btn_submit");
+		
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
+		
+		HttpSession session = request.getSession();
 		
 		try {
 			if( !this.mySqlConnector.loginUser(new User(username, password, null))) {
 				System.out.println("Log in failed");
+				
+				loginfailed = true;
+				
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/LoginPage.jsp");
+				dispatcher.forward(request, response);
 			}
 			else {
-				HttpSession session = request.getSession();
+				User.Role role = mySqlConnector.checkUserRole(new User(username, password, null));
+				
+				Cookie c_uname = new Cookie("username", username);
+				Cookie c_pass = new Cookie("password", password);
+				Cookie c_role = new Cookie("role", role.toString());
+				
+				c_uname.setMaxAge(3600);
+				c_pass.setMaxAge(3600);
+				c_role.setMaxAge(3600);
+				
+				response.addCookie(c_uname);
+				response.addCookie(c_pass);
+				response.addCookie(c_role);
+				
+				loginfailed = false;
+				
 				session.setAttribute("username", username);
 				session.setAttribute("password", password);
+				session.setAttribute("role", role);
 				
-				RequestDispatcher dispatcher = request.getRequestDispatcher("/todolist");
-				dispatcher.forward(request, response);
+				response.sendRedirect("/WebToDoList/todolist");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

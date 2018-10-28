@@ -1,5 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<link rel="stylesheet" href="css/style.css">
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,31 +12,20 @@
 <title>Login Page</title>
 </head>
 
-<%
-String username = null;
-String password = null;
-
-Cookie[] cookies = request.getCookies();
-if(cookies != null) {
-	for( int i = 0; i < cookies.length; i++) {
-		if(cookies[i].getName().equals("username")) {
-			request.setAttribute("username", cookies[i].getValue());
-		}
-		if(cookies[i].getName().equals("password")) {
-			request.setAttribute("password", cookies[i].getValue());
-		}
-	}
-}
-%>
-
 <body>
-	<div>
-		<h1>LOGIN PAGE</h1>
-		<form action="login" method="post">
-			<input type="text" name="username" id="username" value="Username"/>
-			<input type="password" name="password" id="password" value="Password"/>
+	<div class="login-form-1">
+		<c:set var="fail" value="${ loginfailed }"/>
+		<c:if test="${ fail == true }">
+			<h1>LOG IN FAILED !</h1>
+		</c:if>
+		
+		<h1>LOG IN</h1><br>
+		<form class="login-main" action="login" method="post">
+			<input type="text" name="username" id="username" value="${ u_name }"/> <br>
+			<input type="password" name="password" id="password" value="${ u_pass }"/> <br>
 			
 			<input type="submit" name="submit_btn" value="LOG IN"/>
+			<input type="submit" name="submit_btn" value="REGISTER"/>
 		</form>
 	</div>
 </body>

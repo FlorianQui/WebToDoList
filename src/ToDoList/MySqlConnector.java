@@ -21,6 +21,8 @@ public class MySqlConnector {
 	public MySqlConnector() throws ClassNotFoundException, SQLException{
 		super();
 		
+		//TEST
+		
 		//load jdbc driver
 		Class.forName("com.mysql.jdbc.Driver");
 	}
@@ -58,6 +60,27 @@ public class MySqlConnector {
 		query.close();
 		conn.close();
 	}
+	
+	public ToDo getToDo(int id) throws SQLException{
+		ToDo todo = new ToDo(id, "");
+		
+		Connection conn = DriverManager.getConnection( url, user, password );
+		
+		Statement query = conn.createStatement();
+		
+		String myQuery = "SELECT idtodo, description FROM todo WHERE idtodo = '" + id + "';";
+		ResultSet response = query.executeQuery(myQuery);
+		
+		if(response.next()) {
+			todo.setDescription(response.getString("description"));
+		}
+		
+		response.close();
+		query.close();
+		conn.close();
+		
+		return todo;
+	}
 
 	public void updateToDo(ToDo todo) throws SQLException{
 		Connection conn = DriverManager.getConnection( url, user, password );
@@ -85,7 +108,7 @@ public class MySqlConnector {
 		conn.close();
 	}
 	
-	public List<ToDo> fetchToDo() throws SQLException {
+	public ArrayList<ToDo> fetchToDo() throws SQLException {
 		ArrayList<ToDo> listResult = new ArrayList<ToDo>();
 		
 		Connection conn = DriverManager.getConnection( url, user, password );
